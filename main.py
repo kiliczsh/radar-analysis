@@ -116,6 +116,64 @@ def create_new_vs_existing_chart(df):
     
     st.plotly_chart(fig)
 
+def create_cumulative_new_vs_total_chart(df):
+    new_vs_total = df.groupby('volume').agg({
+        'isNew': lambda x: (x == 'TRUE').sum(),
+        'name': 'count'
+    }).reset_index()
+    
+    new_vs_total.columns = ['volume', 'New', 'Total']
+    new_vs_total['Cumulative New'] = new_vs_total['New'].cumsum()
+    new_vs_total['Cumulative Total'] = new_vs_total['Total'].cumsum()
+    
+    fig = go.Figure()
+    
+    # Add area traces for cumulative data
+    fig.add_trace(go.Scatter(
+        x=new_vs_total['volume'],
+        y=new_vs_total['Cumulative Total'],
+        fill='tozeroy',
+        name='Total',
+        line=dict(color='#FFB3BA', width=0),
+        fillcolor='rgba(255, 179, 186, 0.5)'
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=new_vs_total['volume'],
+        y=new_vs_total['Cumulative New'],
+        fill='tozeroy',
+        name='New',
+        line=dict(color='#BAFFC9', width=0),
+        fillcolor='rgba(186, 255, 201, 0.5)'
+    ))
+    
+    # Add line traces for non-cumulative data
+    fig.add_trace(go.Scatter(
+        x=new_vs_total['volume'],
+        y=new_vs_total['Total'],
+        mode='lines',
+        name='Total (per volume)',
+        line=dict(color='#FF6B6B', width=2)
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=new_vs_total['volume'],
+        y=new_vs_total['New'],
+        mode='lines',
+        name='New (per volume)',
+        line=dict(color='#4ECDC4', width=2)
+    ))
+    
+    fig.update_layout(
+        title='Cumulative and Per-Volume New vs. Total Technologies',
+        xaxis_title='Volume',
+        yaxis_title='Count',
+        legend_title='Technology Type',
+        hovermode='x unified'
+    )
+    
+    st.plotly_chart(fig)
+
 def display_conclusion(start_volume, end_volume, volume_info):
     start_info = volume_info[volume_info['volume_id'] == start_volume].iloc[0]
     end_info = volume_info[volume_info['volume_id'] == end_volume].iloc[0]
@@ -193,6 +251,7 @@ def main():
     create_chart(df_filtered, 'quadrant', 'Technologies by Quadrant and Volume')
     create_chart(df_filtered, 'ring', 'Technologies by Ring and Volume', 'stack')
     create_new_vs_existing_chart(df_filtered)
+    create_cumulative_new_vs_total_chart(df_filtered)
     display_occurrences(df_filtered)
     display_conclusion(start_volume, end_volume, volume_info)
 
