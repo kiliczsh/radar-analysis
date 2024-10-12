@@ -213,6 +213,7 @@ def display_author_info():
     st.sidebar.info(
         "This app was created by Muhammed Kılıç.\n\n"
         "Prepared for the 8th Devnot Developer Summit on October 12, 2024\n\n"
+        "[summit.muhammedkilic.com](https://summit.muhammedkilic.com/)\n\n"
         "Learn more at [summit.devnot.com](https://summit.devnot.com/)\n\n"
         "Contact me:\n\n"
         "Website: [muhammedkilic.com](https://muhammedkilic.com)\n\n"
